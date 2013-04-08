@@ -168,6 +168,9 @@ namespace EggsMonitor.Manager
             ActuatorState actuatorState = (ActuatorState)GetData(message, "actuatorstate");
             String actuatorDuration = GetStringData(message, "actuatorduration");
 
+            double motorCurrent = GetData(message, "motorcurrent");
+            bool controlActivated = GetBooleanData(message, "controlactivated");
+
             this.IncubatorData.Add(new IncubatorData(DateTime.Now, temperature, relativeHumidity, (int)co2));
 
             DetailedViewModel.Instance.OnUpdateTemperatureData(temperature, targetTemperature, limitMaxTemperature, maxtemperaturereached, heatPower);
@@ -179,6 +182,8 @@ namespace EggsMonitor.Manager
             DetailedViewModel.Instance.OnUpdateVentilationData(fanState, trapState, ventilationState, ventilationDuration, ventilationIntervalTarget, ventilationDurationTarget, ventilationStandby);
 
             DetailedViewModel.Instance.OnUpdateActuatorData(actuatorState, actuatorDuration);
+
+            DetailedViewModel.Instance.OnUpdateGeneral(controlActivated, motorCurrent);
           }
           catch (Exception ex)
           {
@@ -235,7 +240,13 @@ namespace EggsMonitor.Manager
         {
             string activateTxt = string.Format("PUMP_ACTIVATE {0}", activate);
             CommunicationNetwork.Instance.Send(activateTxt);
-        }        
+        }
+
+        public void SendControlActivated(int activated)
+        {
+            string activateTxt = string.Format("CONTROL_ACTIVATED {0}", activated);
+            CommunicationNetwork.Instance.Send(activateTxt);
+        }  
         #endregion
     }
 }
